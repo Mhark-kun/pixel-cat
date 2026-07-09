@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>🐱 Pixel Cat Survival</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ══ START SCREEN ══ -->
+<div id="startMenu" class="overlay">
+    <div class="overlay-inner">
+        <div class="logo-title">🐱</div>
+        <h1 class="game-title">PIXEL CAT</h1>
+        <p class="game-subtitle">S U R V I V A L</p>
+        <div class="menu-btns">
+            <button class="menu-btn primary" id="btnNewGame">▶ NEW GAME</button>
+            <button class="menu-btn" id="btnContinue" style="display:none">⚡ CONTINUE</button>
+        </div>
+        <div class="hint-grid">
+            <span class="hk">WASD / ↑↓←→</span><span>Move</span>
+            <span class="hk">SPACE</span><span>Ghost Mode</span>
+            <span class="hk">I</span><span>Inventory</span>
+            <span class="hk">B</span><span>Shop</span>
+            <span class="hk">F5</span><span>Save</span>
+            <span class="hk">ESC</span><span>Pause</span>
+        </div>
+    </div>
+</div>
+
+<!-- ══ PAUSE ══ -->
+<div id="pauseMenu" class="overlay hidden">
+    <div class="overlay-inner">
+        <h1 class="glow-text">⏸ PAUSED</h1>
+        <div class="menu-btns">
+            <button class="menu-btn primary" id="btnResume">▶ RESUME</button>
+            <button class="menu-btn" id="btnSave">💾 SAVE GAME</button>
+            <button class="menu-btn" id="btnQuit">🚪 QUIT TO MENU</button>
+        </div>
+    </div>
+</div>
+
+<!-- ══ INVENTORY ══ -->
+<div id="inventoryMenu" class="overlay hidden">
+    <div class="overlay-inner wide">
+        <h1 class="glow-text">🎒 INVENTORY</h1>
+        <div id="inventoryGrid" class="item-grid"></div>
+        <div class="stat-panel" id="statPanel"></div>
+        <button class="menu-btn mt" id="btnCloseInv">✕ CLOSE</button>
+    </div>
+</div>
+
+<!-- ══ SHOP ══ -->
+<div id="shopMenu" class="overlay hidden">
+    <div class="overlay-inner wide">
+        <h1 class="glow-text">🏪 SHOP</h1>
+        <p id="shopCoins" class="shop-coins">🪙 0</p>
+        <div id="shopGrid" class="item-grid"></div>
+        <button class="menu-btn mt" id="btnCloseShop">✕ CLOSE</button>
+    </div>
+</div>
+
+<!-- ══ BOSS INTRO ══ -->
+<div id="bossIntro" class="overlay hidden">
+    <div class="overlay-inner">
+        <div class="boss-warn">⚠ WARNING ⚠</div>
+        <h1 id="bossName" class="boss-title">BOSS INCOMING!</h1>
+        <p id="bossDesc" class="boss-desc"></p>
+        <button class="menu-btn primary mt" id="btnBossOk">⚔ FIGHT!</button>
+    </div>
+</div>
+
+<!-- ══ MAP TRANSITION ══ -->
+<div id="mapTransition" class="overlay hidden">
+    <div class="overlay-inner">
+        <p class="map-label">ENTERING</p>
+        <h1 id="mapName" class="glow-text"></h1>
+        <p id="mapFlavour" class="map-flavour"></p>
+    </div>
+</div>
+
+<!-- ══ DEATH SCREEN ══ -->
+<div id="deathScreen" class="overlay hidden">
+    <div class="disco-lights" id="discoLights"></div>
+    <div class="death-content">
+        <div class="death-warning">⚠️ WARNING ⚠️</div>
+        <div class="death-title" id="deathTitle">U DIED</div>
+        <div class="death-sub" id="deathSub">SKILL ISSUE DETECTED</div>
+        <div class="death-cat">🐱💀</div>
+        <div class="death-lives" id="deathLives"></div>
+        <button class="menu-btn primary mt" id="btnDeathContinue">▶ CONTINUE</button>
+    </div>
+</div>
+
+<!-- ══ TOAST ══ -->
+<div id="toast" class="toast hidden"></div>
+
+<!-- ══ AUDIO ══ -->
+<audio id="caramelMusic" src="caramelldansen.mp3" preload="auto"></audio>
+
+<!-- ══ GAME WRAPPER ══ -->
+<div id="gameWrapper">
+
+    <!-- TOP HUD -->
+    <div id="topHud">
+        <div class="hud-left">
+            <span id="hudMap" class="hud-map-name">🗺 AREA 1</span>
+            <span id="hudFloor">Floor 1</span>
+        </div>
+        <div class="hud-center">
+            <div class="hud-stat" title="Lives">❤️ <span id="hudLives" class="hv">3</span></div>
+            <div class="hud-stat hp-bar-wrap" title="HP">
+                <span>HP</span>
+                <div class="bar-track"><div id="hpBar" class="bar hp-bar"></div></div>
+                <span id="hudHp" class="hv">100</span>
+            </div>
+            <div class="hud-stat" title="Score">⭐ <span id="hudScore" class="hv">0</span></div>
+            <div class="hud-stat" title="Coins">🪙 <span id="hudCoins" class="hv">0</span></div>
+            <div class="hud-stat" title="High Score">🏆 <span id="hudHi" class="hv">0</span></div>
+        </div>
+        <div class="hud-right">
+            <div class="hud-stat" title="Enemies">👾 <span id="hudEnemies" class="hv">0</span></div>
+            <div class="ability-badge" id="abilityBadge">👻 LOCKED</div>
+        </div>
+    </div>
+
+    <!-- POWER BAR -->
+    <div id="powerWrap"><div id="powerBar"></div></div>
+
+    <!-- BOSS HP BAR (hidden unless boss active) -->
+    <div id="bossHudWrap" class="hidden">
+        <span id="bossHudName">BOSS</span>
+        <div class="bar-track boss-track"><div id="bossHpBar" class="bar boss-bar"></div></div>
+        <span id="bossHudHp">?</span>
+    </div>
+
+    <!-- GAME BOARD -->
+    <div id="gameBoard" tabindex="0"></div>
+
+    <!-- ACTIVE ITEM SHORTCUTS -->
+    <div id="itemBar"></div>
+
+</div>
+
+<!-- MOBILE CONTROLS -->
+<div id="mobileControls">
+    <div class="ctrl-row top-row">
+        <button class="ctrl-btn" id="btnInvM">🎒</button>
+        <button class="ctrl-btn" id="upBtn">⬆</button>
+        <button class="ctrl-btn" id="btnShopM">🏪</button>
+    </div>
+    <div class="ctrl-row">
+        <button class="ctrl-btn" id="leftBtn">⬅</button>
+        <button class="ctrl-btn" id="downBtn">⬇</button>
+        <button class="ctrl-btn" id="rightBtn">➡</button>
+    </div>
+    <div class="ctrl-row">
+        <button id="ghostBtn" class="ghost-btn">👻 GHOST</button>
+        <button id="useItemBtn" class="ghost-btn">🧪 USE</button>
+    </div>
+</div>
+
+<!-- SCRIPTS (order matters) -->
+<script src="js/audio.js"></script>
+<script src="js/save.js"></script>
+<script src="js/maps.js"></script>
+<script src="js/items.js"></script>
+<script src="js/enemies.js"></script>
+<script src="js/boss.js"></script>
+<script src="js/shop.js"></script>
+<script src="js/inventory.js"></script>
+<script src="js/game.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/main.js"></script>
+
+</body>
+</html>
